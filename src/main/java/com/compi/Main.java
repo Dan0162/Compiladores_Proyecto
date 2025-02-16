@@ -24,7 +24,6 @@ public class Main {
 
         String file = getFile(path);
 
-        System.out.println(file);
 
     }
 
