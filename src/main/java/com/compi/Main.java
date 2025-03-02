@@ -24,6 +24,9 @@ public class Main {
 
         String file = getFile(path);
 
+        Lexer.LexicalChech(file);
+        
+
 
     }
 
@@ -34,7 +37,6 @@ public class Main {
             String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
-                stringBuilder.append("\n");
             }
             reader.close();
             return stringBuilder.toString();
