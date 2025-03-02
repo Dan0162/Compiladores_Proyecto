@@ -10,11 +10,11 @@ public class Lexer {
             return false; //error
         }
         
-        if (!seg_var(parser(program, "ProgramVARIABLE:(.*?)FUNCTION(.*?)BEGIN(.*?)END", 1))){
+        if (!seg_var(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 1))){
             return false; //error
         }
 
-        if (!seg_funct(parser(program, "ProgramVARIABLE:(.*?)FUNCTION(.*?)BEGIN(.*?)END", 2))){
+        if (!seg_funct(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 2))){
             return false; //error
         }
 
@@ -34,7 +34,7 @@ public class Lexer {
     private static boolean seg_var(String VARIABLE){ 
         //<seg_var> → VARIABLE : <def_var> <more_var>
 
-        while (VARIABLE.length()>0){//<def_var> → 𝜺 & <more_var> → 𝜺
+        while (!VARIABLE.isEmpty()){//<def_var> → 𝜺 & <more_var> → 𝜺
             if(VARIABLE.matches("int\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*([0-9]+)\\s*;.*")){ 
                 //<def_var> → int ID = Dígitos;
                 VARIABLE = parser(VARIABLE, "^(.*?);(.*)$", 2);                
@@ -60,10 +60,22 @@ public class Lexer {
         return true;
     }
 
-    private static boolean seg_funct (String VARIABLE){
+    private static boolean seg_funct (String FUNCTION){
         
+        while (!FUNCTION.isEmpty()){
+            if (FUNCTION.matches("function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}.*")){
+                if(!def_arith(parser(FUNCTION, "function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}.*", 3))){
+                    return false; //error en aritmética.
+                }
+            }
+        }
         
-        
+        return true;
+    }
+
+    private static boolean def_arith(String ARITHMETIC){
+
+
         return true;
     }
     private static String parser(String text, String regex, int segment){ //Función general para reducir ciertas partes del programa en segmentos
