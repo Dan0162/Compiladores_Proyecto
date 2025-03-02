@@ -8,13 +8,14 @@ public class Lexer {
     public static boolean LexicalChech(String program){
         if (!S(program)){
             return false; //error
-        }
-        
-        if (!seg_var(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 1))){
+        }        
+        else if (!seg_var(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 1))){
             return false; //error
         }
-
-        if (!seg_funct(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 2))){
+        else if (!seg_funct(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 2))){
+            return false; //error
+        }
+        else if (!body_program(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 3))){
             return false; //error
         }
 
@@ -61,9 +62,11 @@ public class Lexer {
     }
 
     private static boolean seg_funct (String FUNCTION){
+        //<seg_funct> → FUNCTION : <def_funct>
         
-        while (!FUNCTION.isEmpty()){
+        while (!FUNCTION.isEmpty()){//<def_funct> → 𝜺 
             if (FUNCTION.matches("function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}.*")){
+                //<def_funct> → function Letras ( ID ) {  <body_funct>
                 if(!def_arith(parser(FUNCTION, "function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}.*", 3))){
                     return false; //error en aritmética.
                 }
@@ -75,11 +78,39 @@ public class Lexer {
     }
 
     private static boolean body_program(String BODY){
+        //<body_program> →  <def_cond><def_while><def_wr><call_funct>
+
+
+        return true;
+    }
+
+    private static boolean def_cond(String COND){
+        //<def_cond> → cond if (EXP) { <body_cond>
+
+        return true;
+    }
+
+    private static boolean def_while(String WHILE){
+        //<def_while> →  loop while( ID > Digito ) { <body_while>
+
+        return true;
+    }
+
+    private static boolean def_wr(String WR){
+        //<def_wr>→ output write ( <cont> ) <body_program>  
+
+        return true;
+    }
+
+    private static boolean call_funct(String FUNCT){
+        //<call_funct> → ID =  Letras ( ID ) <body_program>;
 
         return true;
     }
 
     private static boolean def_arith(String ARITHMETIC){
+        //<def_arith> → <body_seg_E> <more_arith>
+
 
 
         return true;
