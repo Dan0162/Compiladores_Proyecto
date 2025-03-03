@@ -1,5 +1,4 @@
 package com.compi;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,16 +6,16 @@ public class Lexer {
     
     public static boolean LexicalChech(String program){
         if (!S(program)){
-            return false; //error
+            return false; //error en encapsulación de programa
         }        
         else if (!seg_var(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 1))){
-            return false; //error
+            return false; //error en variables
         }
         else if (!seg_funct(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 2))){
-            return false; //error
+            return false; //error en funciones
         }
         else if (!body_program(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 3))){
-            return false; //error
+            return false; //error en cuerpo
         }
 
         return true;
@@ -79,7 +78,8 @@ public class Lexer {
 
     private static boolean body_program(String BODY){
         //<body_program> →  <def_cond><def_while><def_wr><call_funct>
-
+        
+        
 
         return true;
     }
