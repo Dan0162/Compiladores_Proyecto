@@ -78,8 +78,23 @@ public class Lexer {
 
     private static boolean body_program(String BODY){
         //<body_program> →  <def_cond><def_while><def_wr><call_funct>
-        
-        
+        while(!BODY.isEmpty()){
+            if (BODY.matches("")){
+
+            }
+            else if(BODY.matches("")){
+    
+            }
+            else if(BODY.matches("")){
+    
+            }
+            else if(BODY.matches("")){
+    
+            }
+            else{
+                return false; 
+            }
+        }        
 
         return true;
     }
