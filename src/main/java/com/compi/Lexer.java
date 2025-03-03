@@ -125,7 +125,44 @@ public class Lexer {
 
 
     //-------------------------------------------------------------
+private static boolean def_while(String WHILE) {
+    //<def_while> → loop while( ID > Digito ) { <body_while>
+    //<def_while> → 𝜺
 
+    if (WHILE == null || WHILE.isEmpty()) return true; // 𝜺
+
+    if (WHILE.matches("loop\\s+while\\s*\\(([a-zA-Z][a-zA-Z0-9]*)\\s*>\\s*\\d+\\)\\s*\\{(.*?)\\}.*")) {
+        String bodyWhile = parser(WHILE, "loop\\s+while\\s*\\(([a-zA-Z][a-zA-Z0-9]*)\\s*>\\s*\\d+\\)\\s*\\{(.*?)\\}(.*)", 2);
+        return body_while(bodyWhile);
+    } else {
+        return false;
+    }
+}
+
+private static boolean body_while(String BODY) {
+    //<body_while> → <def_w> <end_while>
+
+    if (BODY == null || BODY.isEmpty()) return false;
+
+    String defW = parser(BODY, "(.*?)\\{.*\\}", 1);
+    String endWhile = parser(BODY, ".*\\{(.*?)\\}", 1);
+
+    return def_w(defW) && end_while(endWhile);
+}
+
+private static boolean end_while(String END) {
+    //<end_while> → ID SignoAritmetica } <body_program>
+
+    if (END == null || END.isEmpty()) return false;
+
+    if (END.matches("([a-zA-Z][a-zA-Z0-9]*)\\s*([\\+\\-\\*\\/])\\s*\\}.*")) {
+        String bodyProgram = parser(END, "([a-zA-Z][a-zA-Z0-9]*)\\s*([\\+\\-\\*\\/])\\s*\\}(.*)", 3);
+        return body_program(bodyProgram);
+    } else {
+        return false;
+    }
+}
+   
     private static boolean def_arith(String ARITHMETIC) {
         return body_seg_E(ARITHMETIC);
     }
