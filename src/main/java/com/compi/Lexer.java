@@ -97,6 +97,42 @@ public class Lexer {
     }
 
     private static boolean def_wr(String WR){
+    //<def_wr> → output write ( <cont> ); <body_program>  
+    //<def_wr> → input ID = read ( <cont> ); <body_program>
+    //<def_wr> → 𝜺
+
+    if (WR.matches("output\\s+write\\s*\\((.*?)\\);.*")) {
+        String cont = parser(WR, "output\\s+write\\s*\\((.*?)\\);", 1);
+        if (!cont(cont)) {
+            return false; // error en contenido
+        }
+        return body_program(parser(WR, "output\\s+write\\s*\\((.*?)\\);(.*)", 2));
+    } else if (WR.matches("input\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*read\\s*\\((.*?)\\);.*")) {
+        String cont = parser(WR, "input\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*read\\s*\\((.*?)\\);", 2);
+        if (!cont(cont)) {
+            return false; // error en contenido
+        }
+        return body_program(parser(WR, "input\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*read\\s*\\((.*?)\\);(.*)", 3));
+    } else {
+        return WR.isEmpty() || body_program(WR);
+    }
+
+
+private static boolean cont(String CONT) {
+    //<cont> → Cadena  
+    //<cont> → Dígitos 
+    //<cont> → Dígitos . Dígitos 
+    //<cont> → 𝜺
+
+    if (CONT.matches("\".*\"")) {
+        return true; // Cadena
+    } else if (CONT.matches("\\d+")) {
+        return true; // Dígitos
+    } else if (CONT.matches("\\d+\\.\\d+")) {
+        return true; // Dígitos.Dígitos
+    } else {
+        return CONT.isEmpty(); // 𝜺
+    
         //<def_wr>→ output write ( <cont> ) <body_program>  
 
         return true;
@@ -109,7 +145,10 @@ public class Lexer {
     }
 
     private static boolean def_arith(String ARITHMETIC){
-        private static boolean body_seg_E(String E) {
+    return body_seg_E(ARITHMETIC);
+}
+
+private static boolean body_seg_E(String E) {
     if (E == null || E.isEmpty()) return false;
 
     String bodyT = parser(E, "(.*?)\\+.*|", 1);
@@ -167,13 +206,13 @@ private static boolean item_arith(String item) {
     } else {
         return false;
     }
+}
 
-        //<def_arith> → <body_seg_E> <more_arith>
-
-
-
-        return true;
-    }
+private static boolean more_arith(String E) {
+    // <more_arith> → <body_seg_E>
+    // <more_arith> → 𝜺
+    return E.isEmpty() || body_seg_E(E);
+}
     private static String parser(String text, String regex, int segment){ //Función general para reducir ciertas partes del programa en segmentos
 
         Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
