@@ -109,6 +109,65 @@ public class Lexer {
     }
 
     private static boolean def_arith(String ARITHMETIC){
+        private static boolean body_seg_E(String E) {
+    if (E == null || E.isEmpty()) return false;
+
+    String bodyT = parser(E, "(.*?)\\+.*|", 1);
+    String rest = parser(E, ".*?\\+(.*)", 2);
+    if (bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest)) return true;
+
+    bodyT = parser(E, "(.*?)\\-.*|", 1);
+    rest = parser(E, ".*?\\-(.*)", 2);
+    return bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest);
+}
+
+private static boolean body_seg_E_prime(String E_prime) {
+    if (E_prime == null || E_prime.isEmpty()) return true;
+
+    String bodyT = parser(E_prime, "(.*?)\\+.*|", 1);
+    String rest = parser(E_prime, ".*?\\+(.*)", 2);
+    if (bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest)) return true;
+
+    bodyT = parser(E_prime, "(.*?)\\-.*|", 1);
+    rest = parser(E_prime, ".*?\\-(.*)", 2);
+    return bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest);
+}
+
+private static boolean body_seg_T(String T) {
+    if (T == null || T.isEmpty()) return false;
+
+    String item = parser(T, "(.*?)\\*.*|", 1);
+    String rest = parser(T, ".*?\\*(.*)", 2);
+    if (item != null && item_arith(item) && body_seg_T_prime(rest)) return true;
+
+    item = parser(T, "(.*?)\\/.*|", 1);
+    rest = parser(T, ".*?\\/(.*)", 2);
+    return item != null && item_arith(item) && body_seg_T_prime(rest);
+}
+
+private static boolean body_seg_T_prime(String T_prime) {
+    if (T_prime == null || T_prime.isEmpty()) return true;
+
+    String item = parser(T_prime, "(.*?)\\*.*|", 1);
+    String rest = parser(T_prime, ".*?\\*(.*)", 2);
+    if (item != null && item_arith(item) && body_seg_T_prime(rest)) return true;
+
+    item = parser(T_prime, "(.*?)\\/.*|", 1);
+    rest = parser(T_prime, ".*?\\/(.*)", 2);
+    return item != null && item_arith(item) && body_seg_T_prime(rest);
+}
+
+private static boolean item_arith(String item) {
+    if (item.matches("\\d+")) { // Dígitos
+        return true;
+    } else if (item.matches("[a-zA-Z][a-zA-Z0-9]*")) { // ID
+        return true;
+    } else if (item.matches("\\(.*\\)")) { // ( <body_seg_E> )
+        return body_seg_E(parser(item, "\\((.*)\\)", 1));
+    } else {
+        return false;
+    }
+
         //<def_arith> → <body_seg_E> <more_arith>
 
 
