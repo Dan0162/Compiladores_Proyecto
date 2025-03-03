@@ -79,6 +79,20 @@ public class Lexer {
             return WR.isEmpty() || body_program(WR);
         }
     }
+    private static boolean call_funct(String FUNCT){ 
+        //<call_funct> → ID = Letras ( ID ) <body_program>; return true;
+
+    if (FUNCT == null || FUNCT.isEmpty()) return true; // 𝜺
+
+    if (FUNCT.matches("([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\);.*")) {
+        String bodyProgram = parser(FUNCT, "([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\);(.*)", 4);
+        return body_program(bodyProgram); 
+        
+    } else {
+        return false;
+    }
+    
+    
 
     private static boolean cont(String CONT) {
         return CONT.matches("\".*\"") || CONT.matches("\\d+") || CONT.matches("\\d+\\.\\d+") || CONT.isEmpty();
