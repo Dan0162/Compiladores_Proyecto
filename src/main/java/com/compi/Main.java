@@ -8,8 +8,9 @@ import java.nio.charset.StandardCharsets;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));        
-        System.out.println("Por favor ingresar la ruta del archivo .txt que contiene su lenguaje. Solamente se aceptan archivos .txt\n");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+        System.out.println(
+                "Por favor ingresar la ruta del archivo .txt que contiene su lenguaje. Solamente se aceptan archivos .txt\n");
 
         String path = null;
         try {
@@ -17,26 +18,30 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         if (!path.endsWith(".txt")) {
             throw new Exception("El archivo ingresado no es un archivo .txt");
         }
 
         String file = getFile(path);
 
-        Lexer.LexicalChech(file);
-        
-
-
+        if (file != null) {
+            Lexer lexer = new Lexer(file);
+            lexer.tokenize();
+            for (TOKEN token : lexer.getTokens()) {
+                System.out.println("Token: " + token.type + " -> " + token.value);
+            }
+        }
     }
 
-    public static String getFile(String path){
+    public static String getFile(String path) {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8));
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8));
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
+                stringBuilder.append(line).append("\n");
             }
             reader.close();
             return stringBuilder.toString();

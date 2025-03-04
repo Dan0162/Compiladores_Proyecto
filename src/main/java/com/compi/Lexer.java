@@ -1,232 +1,97 @@
 package com.compi;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+enum TOKENType {
+    PRProgram, TypeInt, TypeFloat, TypeString, TypeBool, ID, SignEqual, String, NUM,
+    SignDot, PRBool, ParenRight, ParenLeft, LeftKey, RightKey, PRBegin, PRExp, PRCond,
+    PRVar, DoubleDot, PRSegFunct, PRFunct, PREnd, PRLoop, Output, Input, Plus, Minus,
+    Mult, Div, Minor, MinorEqual, Major, MajorEqual, Dif, PRReturn, PRElse
+}
+
+class TOKEN {
+    TOKENType type;
+    String value;
+
+    public TOKEN(TOKENType type, String value) {
+        this.type = type;
+        this.value = value;
+    }
+
+}
+
 public class Lexer {
-    
-    public static boolean LexicalChech(String program){
-        if (!S(program)){
-            return false; //error
-        }        
-        else if (!seg_var(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 1))){
-            return false; //error
-        }
-        else if (!seg_funct(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 2))){
-            return false; //error
-        }
-        else if (!body_program(parser(program, "ProgramVARIABLE:(.*?)FUNCTION:(.*?)BEGIN(.*?)END", 3))){
-            return false; //error
-        }
+    private String input;
+    private List<TOKEN> tokens;
 
-        return true;
+    public Lexer(String input) {
+        this.input = input;
+        this.tokens = new ArrayList<>();
     }
 
-    private static boolean S(String program){ 
-        //<S> → Program <seg_var> <seg_funct> BEGIN <body_program> END
+    public void tokenize() {
+        // ER para la palabra reservada de programa
+        String PRProgram = "(?<PRProgram>\\bProgram\\b)";
+        String TypeInt = "(?<TypeInt>\\bint\\b)";
+        String TypeFloat = "(?<TypeFloat>\\bfloat\\b)";
+        String TypeString = "(?<TypeString>\\bstring\\b)";
+        String TypeBool = "(?<TypeBool>\\bbool\\b)";
+        String ID = "(?<ID>[a-zA-Z][a-zA-Z0-9]*[^?])";
+        String SignEqual = "(?<SignEqual>=)";
+        String StringLiteral = "(?<String>\"[^\"]*\")";
+        String NUM = "(?<NUM>\\b\\d+\\b)";
+        String SignDot = "(?<SignDot>\\.)";
+        String PRBool = "(?<PRBool>\\btrue|false\\b)";
+        String ParenRight = "(?<ParenRight>\\))";
+        String ParenLeft = "(?<ParenLeft>\\()";
+        String LeftKey = "(?<LeftKey>\\{)";
+        String RightKey = "(?<RightKey>\\})";
+        String PRBegin = "(?<PRBegin>\\bBEGIN\\b)";
+        String PRExp = "(?<PRExp>\\bexp\\b)";
+        String PRCond = "(?<PRCond>\\bcond\\b)";
+        String PRVar = "(?<PRVar>\\bVARIABLE\\b)";
+        String DoubleDot = "(?<DoubleDot>:)";
+        String PRSegFunct = "(?<PRSegFunct>\\bFUNCTION\\b)";
+        String PRFunct = "(?<PRFunct>\\bfunction\\b)";
+        String PREnd = "(?<PREnd>\\bEND\\b)";
+        String PRLoop = "(?<PRLoop>\\bloop\\b)";
+        String Output = "(?<Output>\\bwrite\\b)";
+        String Input = "(?<Input>\\boutput\\b)";
+        String PRReturn = "(?<PRReturn>\\bRETURN\\b)";
+        String Plus = "(?<Plus>\\+)";
+        String Minus = "(?<Minus>\\-)";
+        String Mult = "(?<Mult>\\*)";
+        String Div = "(?<Div>\\/)";
+        String Minor = "(?<Minor>\\<)";
+        String Major = "(?<Major>\\>)";
+        String MinorEqual = "(?<MinorEqual>\\<=)";
+        String MajorEqual = "(?<MajorEqual>\\>=)";
+        String Dif = "(?<Dif>\\<>)";
+        String PRElse = "(?<PRElse>\\belse\\b)";
 
-        if (program.matches(".*Program.*BEGIN.*END.*")) {
-            return true;
-        } else {
-            return false; //error
-        }
-    }
+        String regex = String.join("|", PRProgram, PRVar, TypeInt, TypeFloat, TypeString, TypeBool, StringLiteral,
+                PRBool, PRSegFunct, PRFunct, PRReturn, Plus, Minus, Mult, Div, Dif, MinorEqual, Minor, MajorEqual,
+                Major, SignEqual, NUM, SignDot, ParenRight, ParenLeft,
+                LeftKey, RightKey, PRBegin, PRExp, PRCond, DoubleDot, PREnd, PRLoop, Output, Input, PRElse, ID);
 
-    private static boolean seg_var(String VARIABLE){ 
-        //<seg_var> → VARIABLE : <def_var> <more_var>
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
 
-        while (!VARIABLE.isEmpty()){//<def_var> → 𝜺 & <more_var> → 𝜺
-            if(VARIABLE.matches("int\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*([0-9]+)\\s*;.*")){ 
-                //<def_var> → int ID = Dígitos;
-                VARIABLE = parser(VARIABLE, "^(.*?);(.*)$", 2);                
-            }
-            else if(VARIABLE.matches("float\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*([0-9]+.[0-9]+)\\s*;.*")){
-                //<def_var> →  float ID = Dígitos.Dígitos;
-                VARIABLE = parser(VARIABLE, "^(.*?);(.*)$", 2);
-
-            }
-            else if(VARIABLE.matches("string\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*\"(.*)\"\\s*;.*")){//duda con el (.*)
-                //<def_var> → string ID = “ Cadena “;
-                VARIABLE = parser(VARIABLE, "^(.*?);(.*)$", 2);
-            }
-            else if(VARIABLE.matches("bool\\s+([a-zA-Z][a-zA-Z0-9]*)\\s*=\\s*(true|false)\\s*;.*")){
-                //<def_var> → bool ID = PRBool;
-                VARIABLE = parser(VARIABLE, "^(.*?);(.*)$", 2);
-            }
-            else{
-                return false;    
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean seg_funct (String FUNCTION){
-        //<seg_funct> → FUNCTION : <def_funct>
-        
-        while (!FUNCTION.isEmpty()){//<def_funct> → 𝜺 
-            if (FUNCTION.matches("function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}.*")){
-                //<def_funct> → function Letras ( ID ) {  <body_funct>
-                if(!def_arith(parser(FUNCTION, "function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}.*", 3))){
-                    return false; //error en aritmética.
+        while (matcher.find()) {
+            for (TOKENType type : TOKENType.values()) {
+                if (matcher.group(type.name()) != null) {
+                    tokens.add(new TOKEN(type, matcher.group(type.name())));
+                    break;
                 }
-                FUNCTION = parser(FUNCTION,"function\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\\s*\\{(.*?)RETURN\\s+([a-zA-Z_][a-zA-Z0-9_]*);\\}(.*)", 5);
             }
         }
-        
-        return true;
     }
 
-    private static boolean body_program(String BODY){
-        //<body_program> →  <def_cond><def_while><def_wr><call_funct>
-
-
-        return true;
+    public List<TOKEN> getTokens() {
+        return tokens;
     }
-
-    private static boolean def_cond(String COND){
-        //<def_cond> → cond if (EXP) { <body_cond>
-
-        return true;
-    }
-
-    private static boolean def_while(String WHILE){
-        //<def_while> →  loop while( ID > Digito ) { <body_while>
-
-        return true;
-    }
-
-    private static boolean def_wr(String WR){
-        //<def_wr>→ output write ( <cont> ) <body_program>  
-
-        return true;
-    }
-
-    private static boolean call_funct(String FUNCT){
-        //<call_funct> → ID =  Letras ( ID ) <body_program>;
-
-        return true;
-    }
-
-    private static String parser(String text, String regex, int segment){ //Función general para reducir ciertas partes del programa en segmentos
-
-        Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(text);
-
-        if (matcher.find()) {
-            return(matcher.group(segment).trim());
-        } else {
-            System.out.println("No match found!"); //error
-            return("");
-        }
-
-    }
-
-
-
-
-    //-------------------------------------------------------------
-private static boolean def_while(String WHILE) {
-    //<def_while> → loop while( ID > Digito ) { <body_while>
-    //<def_while> → 𝜺
-
-    if (WHILE == null || WHILE.isEmpty()) return true; // 𝜺
-
-    if (WHILE.matches("loop\\s+while\\s*\\(([a-zA-Z][a-zA-Z0-9]*)\\s*>\\s*\\d+\\)\\s*\\{(.*?)\\}.*")) {
-        String bodyWhile = parser(WHILE, "loop\\s+while\\s*\\(([a-zA-Z][a-zA-Z0-9]*)\\s*>\\s*\\d+\\)\\s*\\{(.*?)\\}(.*)", 2);
-        return body_while(bodyWhile);
-    } else {
-        return false;
-    }
-}
-
-private static boolean body_while(String BODY) {
-    //<body_while> → <def_w> <end_while>
-
-    if (BODY == null || BODY.isEmpty()) return false;
-
-    String defW = parser(BODY, "(.*?)\\{.*\\}", 1);
-    String endWhile = parser(BODY, ".*\\{(.*?)\\}", 1);
-
-    return def_w(defW) && end_while(endWhile);
-}
-
-private static boolean end_while(String END) {
-    //<end_while> → ID SignoAritmetica } <body_program>
-
-    if (END == null || END.isEmpty()) return false;
-
-    if (END.matches("([a-zA-Z][a-zA-Z0-9]*)\\s*([\\+\\-\\*\\/])\\s*\\}.*")) {
-        String bodyProgram = parser(END, "([a-zA-Z][a-zA-Z0-9]*)\\s*([\\+\\-\\*\\/])\\s*\\}(.*)", 3);
-        return body_program(bodyProgram);
-    } else {
-        return false;
-    }
-}
-   
-    private static boolean def_arith(String ARITHMETIC) {
-        return body_seg_E(ARITHMETIC);
-    }
-    
-    private static boolean body_seg_E(String E) {
-        if (E == null || E.isEmpty()) return false;
-    
-        String bodyT = parser(E, "(.?)\\+.|", 1);
-        String rest = parser(E, ".?\\+(.)", 2);
-        if (bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest)) return true;
-    
-        bodyT = parser(E, "(.?)\\-.|", 1);
-        rest = parser(E, ".?\\-(.)", 2);
-        return bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest);
-    }
-    
-    private static boolean body_seg_E_prime(String E_prime) {
-        if (E_prime == null || E_prime.isEmpty()) return true;
-    
-        String bodyT = parser(E_prime, "(.?)\\+.|", 1);
-        String rest = parser(E_prime, ".?\\+(.)", 2);
-        if (bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest)) return true;
-    
-        bodyT = parser(E_prime, "(.?)\\-.|", 1);
-        rest = parser(E_prime, ".?\\-(.)", 2);
-        return bodyT != null && body_seg_T(bodyT) && body_seg_E_prime(rest);
-    }
-    
-    private static boolean body_seg_T(String T) {
-        if (T == null || T.isEmpty()) return false;
-    
-        String item = parser(T, "(.?)\\.*|", 1);
-        String rest = parser(T, ".?\\(.*)", 2);
-        if (item != null && item_arith(item) && body_seg_T_prime(rest)) return true;
-    
-        item = parser(T, "(.?)\\/.|", 1);
-        rest = parser(T, ".?\\/(.)", 2);
-        return item != null && item_arith(item) && body_seg_T_prime(rest);
-    }
-    
-    private static boolean body_seg_T_prime(String T_prime) {
-        if (T_prime == null || T_prime.isEmpty()) return true;
-    
-        String item = parser(T_prime, "(.?)\\.*|", 1);
-        String rest = parser(T_prime, ".?\\(.*)", 2);
-        if (item != null && item_arith(item) && body_seg_T_prime(rest)) return true;
-    
-        item = parser(T_prime, "(.?)\\/.|", 1);
-        rest = parser(T_prime, ".?\\/(.)", 2);
-        return item != null && item_arith(item) && body_seg_T_prime(rest);
-    }
-    
-    private static boolean item_arith(String item) {
-        if (item.matches("\\d+")) { // Digits
-            return true;
-        } else if (item.matches("[a-zA-Z][a-zA-Z0-9]*")) { // Identifier (ID)
-            return true;
-        } else if (item.matches("\\(.*?\\)")) { // Parenthesized expression
-            String extracted = parser(item, "\\((.*?)\\)", 1);
-            return extracted != null && body_seg_E(extracted);
-        } else {
-            return false;
-        }
-    }
-    
 
 }
