@@ -1,0 +1,18 @@
+Program
+
+VARIABLE:
+
+int result = 0;
+int numm = 33;
+
+FUNCTION:
+
+function foo (num1){
+	num1 = num1 + 2:
+}
+
+BEGIN
+
+result = foo (numm);
+
+END

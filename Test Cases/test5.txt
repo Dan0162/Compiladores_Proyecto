@@ -1,0 +1,23 @@
+Program
+
+VARIABLE:
+
+int result = 0;
+int numm = 33;
+string champ = "Morde";
+string champ2 = "";
+
+FUNCTION:
+
+function foo (num1){
+	num1 = num1 + 2:
+}
+
+BEGIN
+
+input champ2 = read("Kayn");
+output write (champ1);
+output write (champ2);
+result = foo (numm);
+
+END

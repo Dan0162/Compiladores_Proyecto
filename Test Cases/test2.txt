@@ -1,0 +1,14 @@
+Program
+
+VARIABLE:
+
+int lenum = 2;
+ 
+FUNCTION:
+
+BEGIN
+
+lenum = lenum + 3
+
+
+END

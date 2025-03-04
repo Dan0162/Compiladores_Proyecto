@@ -1,0 +1,21 @@
+Program
+
+VARIABLE:
+
+int lenum = 2;
+ 
+FUNCTION:
+
+BEGIN
+
+input lenum = read(23);
+
+if (lenum > 33){
+
+	write("Es mayor a a 33");
+}
+else{
+	write("Es menor a 33");
+}
+
+END

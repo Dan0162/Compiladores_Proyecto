@@ -1,0 +1,13 @@
+Program
+
+VARIABLE:
+
+string text = "Hola mundo";
+
+FUNCTION:
+
+BEGIN
+
+write(text);
+
+END
