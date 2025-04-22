@@ -4,15 +4,24 @@ VARIABLE:
 
 int result = 0;
 int numm = 33;
+string test = "JG diff";
 
 FUNCTION:
 
 function foo (num1){
-	num1 = num1 + 2:
+        num1 + 2;
+        RETURN num1;
 }
 
 BEGIN
 
-result = foo (numm);
+result = foo(numm);
+
+loop while ( result > 30 )
+{
+	output write(test);
+
+  result-;
+}
 
 END

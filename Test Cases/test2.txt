@@ -5,10 +5,15 @@ VARIABLE:
 int lenum = 2;
  
 FUNCTION:
+ function Plus3 (a) {
+ 
+  a + 3;
+  RETURN a;
+}
 
 BEGIN
 
-lenum = lenum + 3
+lenum = Plus3(lenum);
 
 
 END

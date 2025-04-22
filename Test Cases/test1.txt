@@ -8,6 +8,6 @@ FUNCTION:
 
 BEGIN
 
-write(text);
+output write(text);
 
 END

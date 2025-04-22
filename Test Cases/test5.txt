@@ -9,15 +9,26 @@ string champ2 = "";
 
 FUNCTION:
 
-function foo (num1){
-	num1 = num1 + 2:
+function Rotacion (num1){
+	(num1 + 3) / 2;
+	RETURN num1;
 }
 
 BEGIN
 
-input champ2 = read("Kayn");
+input champ2 = read();
 output write (champ1);
 output write (champ2);
 result = foo (numm);
+
+cond if (result == 18 ){
+	output write("Challenger");
+
+}
+else{
+
+	output write("Hierro");
+}
+
 
 END
