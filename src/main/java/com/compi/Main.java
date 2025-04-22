@@ -31,6 +31,10 @@ public class Main {
             for (TOKEN token : lexer.getTokens()) {
                 System.out.println("Token: " + token.type + " -> " + token.value);
             }
+
+            
+
+
         }
     }
 
