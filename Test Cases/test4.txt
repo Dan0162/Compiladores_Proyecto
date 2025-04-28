@@ -17,11 +17,6 @@ BEGIN
 
 result = foo(numm);
 
-loop while ( result > 30 )
-{
-	output write(test);
-
-  result-;
-}
+output write(result);
 
 END

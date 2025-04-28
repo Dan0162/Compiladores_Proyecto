@@ -5,7 +5,6 @@ VARIABLE:
 int result = 0;
 int numm = 33;
 string champ = "Morde";
-string champ2 = "";
 
 FUNCTION:
 
@@ -16,10 +15,8 @@ function Rotacion (num1){
 
 BEGIN
 
-input champ2 = read();
 output write (champ1);
-output write (champ2);
-result = foo (numm);
+result = foo (numm)
 
 loop while( result > 18)
 {

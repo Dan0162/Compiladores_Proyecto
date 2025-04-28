@@ -4,7 +4,7 @@ VARIABLE:
 
 int result = 0;
 int numm = 33;
-string champ = "Morde";
+string champ = 'Morde';
 string champ2 = "";
 
 FUNCTION:
