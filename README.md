@@ -1,1 +1,1 @@
-![Image](https://github.com/user-attachments/assets/436fa97b-d96f-4f39-89e1-7b7a053a179e)
+![Diagrama de clases UML](https://github.com/user-attachments/assets/5d781e93-e9e4-49bb-a32b-f6e40931d392)
