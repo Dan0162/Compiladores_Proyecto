@@ -21,121 +21,141 @@ import com.compi.Gramatica_ANLTR4.ProjParser.ProgContext;
 import com.compi.Gramatica_ANLTR4.ProjParser.SegfunctContext;
 import com.compi.Gramatica_ANLTR4.ProjParser.SegvarContext;
 
-public class Evaluador extends ProjBaseVisitor<Integer>{
+public class Evaluador extends ProjBaseVisitor<String>{
 
     @Override
-    public Integer visitBody_program(Body_programContext ctx) {
+    public String visitBody_program(Body_programContext ctx) {
         // TODO Auto-generated method stub
-        System.out.println("visited: Body_program");
+        System.out.println("Visit: Body_program");
         return super.visitBody_program(ctx);
         
     }
 
     @Override
-    public Integer visitBodyfunct(BodyfunctContext ctx) {
+    public String visitBodyfunct(BodyfunctContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Bodyfunct");
         return super.visitBodyfunct(ctx);
     }
 
     @Override
-    public Integer visitBodysegE(BodysegEContext ctx) {
+    public String visitBodysegE(BodysegEContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: BodysegE");
         return super.visitBodysegE(ctx);
     }
 
     @Override
-    public Integer visitBodysegE2(BodysegE2Context ctx) {
+    public String visitBodysegE2(BodysegE2Context ctx) {
+        System.out.println("Visit: BodysegE2");
         // TODO Auto-generated method stub
         return super.visitBodysegE2(ctx);
     }
 
     @Override
-    public Integer visitBodysegT(BodysegTContext ctx) {
+    public String visitBodysegT(BodysegTContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: BodysegT");
         return super.visitBodysegT(ctx);
     }
 
     @Override
-    public Integer visitBodysegT2(BodysegT2Context ctx) {
+    public String visitBodysegT2(BodysegT2Context ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: BodysegT2");
         return super.visitBodysegT2(ctx);
     }
 
     @Override
-    public Integer visitCall_funct(Call_functContext ctx) {
+    public String visitCall_funct(Call_functContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Call_funct");
         return super.visitCall_funct(ctx);
     }
 
     @Override
-    public Integer visitDef_cond(Def_condContext ctx) {
+    public String visitDef_cond(Def_condContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_cond");
         return super.visitDef_cond(ctx);
     }
 
     @Override
-    public Integer visitDef_exp(Def_expContext ctx) {
+    public String visitDef_exp(Def_expContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_exp");
         return super.visitDef_exp(ctx);
     }
 
     @Override
-    public Integer visitDef_w(Def_wContext ctx) {
+    public String visitDef_w(Def_wContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_w");
         return super.visitDef_w(ctx);
     }
 
     @Override
-    public Integer visitDef_while(Def_whileContext ctx) {
+    public String visitDef_while(Def_whileContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_while");
         return super.visitDef_while(ctx);
     }
 
     @Override
-    public Integer visitDefarith(DefarithContext ctx) {
+    public String visitDefarith(DefarithContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_arith");
         return super.visitDefarith(ctx);
     }
 
     @Override
-    public Integer visitDeffunct(DeffunctContext ctx) {
+    public String visitDeffunct(DeffunctContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_funct");
         return super.visitDeffunct(ctx);
     }
 
     @Override
-    public Integer visitDefvar(DefvarContext ctx) {
+    public String visitDefvar(DefvarContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Def_var");
+        if (ctx.ID().equals("int")){
+
+        }
         return super.visitDefvar(ctx);
     }
 
     @Override
-    public Integer visitElse_cond(Else_condContext ctx) {
+    public String visitElse_cond(Else_condContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Else_cond");
         return super.visitElse_cond(ctx);
     }
 
     @Override
-    public Integer visitItemarith(ItemarithContext ctx) {
+    public String visitItemarith(ItemarithContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Item_arith");
         return super.visitItemarith(ctx);
     }
 
     @Override
-    public Integer visitProg(ProgContext ctx) {
+    public String visitProg(ProgContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Prog");
         return super.visitProg(ctx);
     }
 
     @Override
-    public Integer visitSegfunct(SegfunctContext ctx) {
+    public String visitSegfunct(SegfunctContext ctx) {
         // TODO Auto-generated method stub
+        System.out.println("Visit: Segfunct"); //inicia evaluacion
         return super.visitSegfunct(ctx);
     }
 
     @Override
-    public Integer visitSegvar(SegvarContext ctx) {
-        // TODO Auto-generated method stub
+    public String visitSegvar(SegvarContext ctx) {
+        System.out.println("Visit: Segvar");       
         return super.visitSegvar(ctx);
     }
     
