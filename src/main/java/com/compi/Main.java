@@ -6,6 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import org.antlr.v4.runtime.CommonTokenStream; // Correct import for ANTLR 4.x
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.CharStreams;
+
+import com.compi.Gramatica_ANLTR4.ProjLexer;
+import com.compi.Gramatica_ANLTR4.ProjParser;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
@@ -32,7 +39,15 @@ public class Main {
                 System.out.println("Token: " + token.type + " -> " + token.value);
             }
 
-            
+            ProjLexer lexer2 = new ProjLexer(CharStreams.fromString(file));
+            CommonTokenStream tokens = new CommonTokenStream(lexer2);
+            ProjParser parser = new ProjParser(tokens);
+
+            ParseTree tree = parser.prog();
+
+            // Usar el visitor
+            Evaluador visitor = new Evaluador();
+            String resultado = visitor.visit(tree);
 
 
         }
