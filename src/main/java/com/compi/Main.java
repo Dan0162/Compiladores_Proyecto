@@ -49,6 +49,9 @@ public class Main {
             Evaluador visitor = new Evaluador();
             String resultado = visitor.visit(tree);
 
+              //Se escribe el código en java
+            createFile(visitor.getExportName() + ".java", visitor.getExportProg());
+
 
         }
     }
@@ -69,4 +72,48 @@ public class Main {
             return null;
         }
     }
+
+    public static boolean createFile(String export_name, String export_prog) {
+    Scanner scanner = new Scanner(System.in);
+    
+    // Preguntar por el directorio
+    System.out.print("Ingrese el directorio para guardar su archivo: ");
+    String directoryPath = scanner.nextLine();
+    
+    // Si no existe, se crea el directorio
+    Path directory = Paths.get(directoryPath);
+    if (!Files.exists(directory)) {
+        try {
+            Files.createDirectories(directory);
+            System.out.println("Directorio creado: " + directoryPath);
+        } catch (IOException e) {
+            System.err.println("Error al crear el directorio: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    // Crear el diretorio del archivo
+    String filePath = directoryPath + File.separator + export_name;
+    File file = new File(filePath);
+    
+    // Revisar si ya existe el archivo
+    if (file.exists()) {
+        System.out.print("El archivo ya existe. ¿Desea sobrescribirlo? (y/n): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+        if (!response.equals("y")) {
+            System.out.println("Creación de archivo cancelada.");
+            return false;
+        }
+    }
+    
+    // Escribir contenido al archivo
+    try (FileWriter writer = new FileWriter(file)) {
+        writer.write(export_prog);
+        System.out.println("Archivo creado exitosamente en: " + filePath);
+        return true;
+    } catch (IOException e) {
+        System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        return false;
+    }
+}
 }
