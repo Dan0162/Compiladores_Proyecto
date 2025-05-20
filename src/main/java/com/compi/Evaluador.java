@@ -25,10 +25,12 @@ public class Evaluador extends ProjBaseVisitor<String>{
 
     @Override
     public String visitBody_program(Body_programContext ctx) {
-        // TODO Auto-generated method stub
         System.out.println("Visit: Body_program");
-        return super.visitBody_program(ctx);
         
+        exportProg += "\n" + indent() + "public static void main(String[] args) {\n";
+        indentLevel++;
+        
+        return visitChildren(ctx);
     }
 
     @Override
@@ -73,33 +75,114 @@ public class Evaluador extends ProjBaseVisitor<String>{
         return super.visitCall_funct(ctx);
     }
 
-    @Override
+     @Override
     public String visitDef_cond(Def_condContext ctx) {
-        // TODO Auto-generated method stub
         System.out.println("Visit: Def_cond");
-        return super.visitDef_cond(ctx);
+        
+        exportProg += indent() + "if (";
+        visit(ctx.def_exp());
+        exportProg += ") {\n";
+        
+        indentLevel++;
+        visit(ctx.def_w());
+        indentLevel--;
+        exportProg += indent() + "}";
+        
+        if (ctx.else_cond() != null) {
+            exportProg += " ";
+            visit(ctx.else_cond());
+        } else {
+            exportProg += "\n";
+        }
+        
+        return null;
     }
 
-    @Override
+
+     @Override
     public String visitDef_exp(Def_expContext ctx) {
-        // TODO Auto-generated method stub
         System.out.println("Visit: Def_exp");
-        return super.visitDef_exp(ctx);
+        
+        String id = ctx.ID().getText();
+        
+        if (ctx.COMP() != null) {
+            exportProg += id + " " + ctx.COMP().getText() + " " + ctx.Digitos().getText();
+        } else if (ctx.EQUAL() != null) {
+            if (ctx.Digitos() != null) {
+                exportProg += id + " " + convertEqualOperator(ctx.EQUAL().getText()) + " " + ctx.Digitos().getText();
+            } else {
+                exportProg += id + " " + convertEqualOperator(ctx.EQUAL().getText()) + " " + 
+                             (ctx.getText().contains("true") ? "true" : "false");
+            }
+        }
+        
+        return null;
+    }
+    
+    private String convertEqualOperator(String op) {
+        if ("==".equals(op)) return "==";
+        if ("!=".equals(op)) return "!=";
+        return op; // Default fallback
     }
 
     @Override
     public String visitDef_w(Def_wContext ctx) {
-        // TODO Auto-generated method stub
         System.out.println("Visit: Def_w");
-        return super.visitDef_w(ctx);
+        
+        if (ctx.getText().contains("output")) {
+            String content;
+            if (ctx.Cadena() != null) {
+                content = ctx.Cadena().getText();
+            } else if (ctx.ID() != null) {
+                content = ctx.ID().getText();
+            } else {
+                content = "\"\""; // Empty string as fallback
+            }
+            exportProg += indent() + "System.out.println(" + content + ");\n";
+        } else if (ctx.getText().contains("input")) {
+            String varName = ctx.ID().getText();
+            
+            if (!exportProg.contains("Scanner scanner")) {
+                exportProg += indent() + "java.util.Scanner scanner = new java.util.Scanner(System.in);\n";
+            }
+            
+            String varType = determineVariableType(varName);
+            String scannerMethod = getScannerMethodForType(varType);
+            
+            exportProg += indent() + varName + " = scanner." + scannerMethod + ";\n";
+        }
+        
+        return null;
+    }
+   
+
+   @Override
+    public String visitDef_while(Def_whileContext ctx) {
+        System.out.println("Visit: Def_while");
+        
+        String id = ctx.ID(0).getText();
+        String comp = ctx.COMP().getText();
+        String value = ctx.Digitos().getText();
+        
+        exportProg += indent() + "while (" + id + " " + comp + " " + value + ") {\n";
+        
+        indentLevel++;
+        visit(ctx.def_w());
+        
+        String updateId = ctx.ID(1).getText();
+        String op = ctx.getChild(8).getText();
+        if ("+".equals(op)) {
+            exportProg += indent() + updateId + "++;\n";
+        } else if ("-".equals(op)) {
+            exportProg += indent() + updateId + "--;\n";
+        }
+        
+        indentLevel--;
+        exportProg += indent() + "}\n";
+        
+        return null;
     }
 
-    @Override
-    public String visitDef_while(Def_whileContext ctx) {
-        // TODO Auto-generated method stub
-        System.out.println("Visit: Def_while");
-        return super.visitDef_while(ctx);
-    }
 
     @Override
     public String visitDefarith(DefarithContext ctx) {
@@ -127,10 +210,19 @@ public class Evaluador extends ProjBaseVisitor<String>{
 
     @Override
     public String visitElse_cond(Else_condContext ctx) {
-        // TODO Auto-generated method stub
         System.out.println("Visit: Else_cond");
-        return super.visitElse_cond(ctx);
+        
+        exportProg += "else {\n";
+        
+        indentLevel++;
+        visit(ctx.def_w());
+        indentLevel--;
+        
+        exportProg += indent() + "}\n";
+        
+        return null;
     }
+
 
     @Override
     public String visitItemarith(ItemarithContext ctx) {
