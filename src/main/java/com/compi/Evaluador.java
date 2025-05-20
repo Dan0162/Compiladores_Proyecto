@@ -162,5 +162,61 @@ public class Evaluador extends ProjBaseVisitor<String>{
         System.out.println("Visit: Segvar");       
         return super.visitSegvar(ctx);
     }
+ private String determineVariableType(String varName) {
+        if (exportProg.contains("int " + varName + " =")) {
+            return "int";
+        } else if (exportProg.contains("float " + varName + " =")) {
+            return "float";
+        } else if (exportProg.contains("String " + varName + " =")) {
+            return "String";
+        } else if (exportProg.contains("boolean " + varName + " =")) {
+            return "boolean";
+        }
+        
+        return "int";
+    }
+    
+
+    private String getScannerMethodForType(String type) {
+        switch (type) {
+            case "int":
+                return "nextInt()";
+            case "float":
+                return "nextFloat()";
+            case "String":
+                return "nextLine()";
+            case "boolean":
+                return "nextBoolean()";
+            default:
+                return "nextInt()"; 
+        }
+    }
+
+    @Override
+    public String visitCall_funct(Call_functContext ctx) {
+        System.out.println("Visit: Call_funct");
+        
+        if (ctx.ID().size() >= 3) {
+            String resultVar = ctx.ID(0).getText();
+            String functionName = ctx.ID(1).getText();
+            String paramVar = ctx.ID(2).getText();
+            
+            exportProg += indent() + resultVar + " = " + functionName + "(" + paramVar + ");\n";
+        }
+        
+        return null;
+    }
+
+    @Override
+    public String visitBody_end(Body_endContext ctx) {
+        System.out.println("Visit: Body_end");
+        
+        indentLevel--;
+        exportProg += indent() + "}\n";
+        
+        exportProg += "}\n";
+        
+        return null;
+    }
     
 }
