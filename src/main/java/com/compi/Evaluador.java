@@ -218,5 +218,102 @@ public class Evaluador extends ProjBaseVisitor<String>{
         
         return null;
     }
-    
+
+ // Desde acá - JL20250521
+   @Override
+     public String visitBodyfunct(BodyfunctContext ctx) {
+         System.out.println("Visit: Bodyfunct");
+         
+         if (ctx.defarith() != null) {
+             StringBuilder expressionBuilder = new StringBuilder();
+             processDefarith(ctx.defarith(), expressionBuilder);
+             
+             if (!expressionBuilder.toString().isEmpty()) {
+                 if (ctx.defarith().bodysegE() != null) {
+                     String paramName = ctx.ID().getText();
+                     exportProg += indent() + paramName + " = " + expressionBuilder.toString() + ";\n";
+                 }
+             }
+         }
+         
+         if (ctx.ID() != null) {
+             exportProg += indent() + "return " + ctx.ID().getText() + ";\n";
+         }
+         
+         return null;
+     }
+     
+     private void processDefarith(DefarithContext ctx, StringBuilder builder) {
+         if (ctx.bodysegE() != null) {
+             processExpression(ctx.bodysegE(), builder);
+         }
+     }
+ 
+     @Override
+     public String visitDefarith(DefarithContext ctx) {
+         System.out.println("Visit: Defarith");
+         return visitChildren(ctx);
+     }
+ 
+     @Override
+     public String visitBodysegE(BodysegEContext ctx) {
+         StringBuilder expressionBuilder = new StringBuilder();
+         processExpression(ctx, expressionBuilder);
+         
+         return expressionBuilder.toString();
+     }
+ 
+     private void processExpression(BodysegEContext ctx, StringBuilder builder) {
+         processBodysegT(ctx.bodysegT(), builder);
+         
+         if (ctx.bodysegE2() != null) {
+             processBodysegE2(ctx.bodysegE2(), builder);
+         }
+     }
+ 
+     private void processBodysegE2(BodysegE2Context ctx, StringBuilder builder) {
+         if (ctx.getChildCount() > 0) {
+             builder.append(" ").append(ctx.getChild(0).getText()).append(" ");
+             
+             processBodysegT(ctx.bodysegT(), builder);
+             
+             if (ctx.bodysegE2() != null) {
+                 processBodysegE2(ctx.bodysegE2(), builder);
+             }
+         }
+     }
+ 
+     private void processBodysegT(BodysegTContext ctx, StringBuilder builder) {
+         processItemArith(ctx.itemarith(), builder);
+         
+         if (ctx.bodysegT2() != null) {
+             processBodysegT2(ctx.bodysegT2(), builder);
+         }
+     }
+ 
+     private void processBodysegT2(BodysegT2Context ctx, StringBuilder builder) {
+         if (ctx.getChildCount() > 0) {
+             builder.append(" ").append(ctx.getChild(0).getText()).append(" ");
+             
+             processItemArith(ctx.itemarith(), builder);
+             
+             if (ctx.bodysegT2() != null) {
+                 processBodysegT2(ctx.bodysegT2(), builder);
+             }
+         }
+     }
+ 
+     private void processItemArith(ItemarithContext ctx, StringBuilder builder) {
+         if (ctx.ID() != null) {
+             builder.append(ctx.ID().getText());
+         } else if (ctx.Digitos() != null) {
+             builder.append(ctx.Digitos().getText());
+         } else if (ctx.bodysegE() != null) {
+             builder.append("(");
+             StringBuilder nestedBuilder = new StringBuilder();
+             processExpression(ctx.bodysegE(), nestedBuilder);
+             builder.append(nestedBuilder);
+             builder.append(")");
+         }
+     }
 }
