@@ -1,8 +1,12 @@
 Program
 
+NAME test2;
+
+
 VARIABLE:
 
 int lenum = 2;
+
  
 FUNCTION:
  function Plus3 (a) {
@@ -11,9 +15,16 @@ FUNCTION:
   RETURN a;
 }
 
+function Plus3times3 (a) {
+ 
+  a + 3 * 3;
+  RETURN a;
+}
+
 BEGIN
 
 lenum = Plus3(lenum);
 
+FINITO;
 
 END

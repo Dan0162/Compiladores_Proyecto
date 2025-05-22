@@ -1,5 +1,8 @@
 Program
 
+NAME test4;
+
+
 VARIABLE:
 
 int result = 0;
@@ -18,5 +21,7 @@ BEGIN
 result = foo(numm);
 
 output write(result);
+
+FINITO;
 
 END
