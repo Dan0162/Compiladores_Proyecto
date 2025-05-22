@@ -1,17 +1,24 @@
 package com.compi;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
 
-import org.antlr.v4.runtime.CommonTokenStream; // Correct import for ANTLR 4.x
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.CharStreams;
 
 import com.compi.Gramatica_ANLTR4.ProjLexer;
 import com.compi.Gramatica_ANLTR4.ProjParser;
+
+import org.antlr.v4.runtime.CharStreams;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -39,6 +46,8 @@ public class Main {
                 System.out.println("Token: " + token.type + " -> " + token.value);
             }
 
+            System.out.println("--------------------------------------------------");
+
             ProjLexer lexer2 = new ProjLexer(CharStreams.fromString(file));
             CommonTokenStream tokens = new CommonTokenStream(lexer2);
             ProjParser parser = new ProjParser(tokens);
@@ -49,11 +58,10 @@ public class Main {
             Evaluador visitor = new Evaluador();
             String resultado = visitor.visit(tree);
 
-              //Se escribe el código en java
             createFile(visitor.getExportName() + ".java", visitor.getExportProg());
 
-
         }
+
     }
 
     public static String getFile(String path) {
@@ -76,11 +84,11 @@ public class Main {
     public static boolean createFile(String export_name, String export_prog) {
     Scanner scanner = new Scanner(System.in);
     
-    // Preguntar por el directorio
+    // Ask for directory
     System.out.print("Ingrese el directorio para guardar su archivo: ");
     String directoryPath = scanner.nextLine();
     
-    // Si no existe, se crea el directorio
+    // Create directory if it doesn't exist
     Path directory = Paths.get(directoryPath);
     if (!Files.exists(directory)) {
         try {
@@ -92,11 +100,11 @@ public class Main {
         }
     }
     
-    // Crear el diretorio del archivo
+    // Create full path for the file
     String filePath = directoryPath + File.separator + export_name;
     File file = new File(filePath);
     
-    // Revisar si ya existe el archivo
+    // Check if file already exists
     if (file.exists()) {
         System.out.print("El archivo ya existe. ¿Desea sobrescribirlo? (y/n): ");
         String response = scanner.nextLine().trim().toLowerCase();
@@ -106,7 +114,7 @@ public class Main {
         }
     }
     
-    // Escribir contenido al archivo
+    // Write content to file
     try (FileWriter writer = new FileWriter(file)) {
         writer.write(export_prog);
         System.out.println("Archivo creado exitosamente en: " + filePath);
@@ -116,4 +124,5 @@ public class Main {
         return false;
     }
 }
+
 }

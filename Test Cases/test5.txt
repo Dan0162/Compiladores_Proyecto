@@ -1,10 +1,13 @@
 Program
 
+NAME test5;
+
+
 VARIABLE:
 
 int result = 0;
 int numm = 33;
-string champ = "Morde";
+string champ1 = "Morde";
 string champ2 = "";
 
 FUNCTION:
@@ -19,14 +22,16 @@ BEGIN
 input champ2 = read();
 output write (champ1);
 output write (champ2);
-result = foo (numm);
+result = Rotacion (numm);
 
-loop while( result > 18)
+loop while( result > 18 )
 {
-	output write ("Es legal");
-	result-;
-
+    output write("Es legal");
+    result-;
 }
+
+
+FINITO;
 
 
 END

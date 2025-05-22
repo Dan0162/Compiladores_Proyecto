@@ -1,13 +1,18 @@
 Program
 
+NAME test1;
+
 VARIABLE:
 
 string text = "Hola mundo";
+int dou = 2;
 
 FUNCTION:
 
 BEGIN
 
 output write(text);
+
+FINITO;
 
 END

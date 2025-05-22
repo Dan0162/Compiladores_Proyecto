@@ -1,6 +1,6 @@
 // Generated from Proj.g4 by ANTLR 4.13.2
 
-      package com.compi.Gramatica_ANLTR4;
+    package com.compi.Gramatica_ANLTR4;
 
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -26,6 +26,30 @@ public class ProjBaseListener implements ProjListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitProg(ProjParser.ProgContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterHeader(ProjParser.HeaderContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitHeader(ProjParser.HeaderContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBody_end(ProjParser.Body_endContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBody_end(ProjParser.Body_endContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -175,6 +199,18 @@ public class ProjBaseListener implements ProjListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAssignment(ProjParser.AssignmentContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAssignment(ProjParser.AssignmentContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterDef_cond(ProjParser.Def_condContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -218,6 +254,18 @@ public class ProjBaseListener implements ProjListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDef_while(ProjParser.Def_whileContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIncrement_decrement(ProjParser.Increment_decrementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIncrement_decrement(ProjParser.Increment_decrementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

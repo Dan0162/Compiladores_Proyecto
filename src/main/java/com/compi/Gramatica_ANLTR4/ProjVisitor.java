@@ -1,6 +1,6 @@
 // Generated from Proj.g4 by ANTLR 4.13.2
 
-package com.compi.Gramatica_ANLTR4;
+    package com.compi.Gramatica_ANLTR4;
 
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -18,6 +18,18 @@ public interface ProjVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitProg(ProjParser.ProgContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ProjParser#header}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHeader(ProjParser.HeaderContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ProjParser#body_end}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBody_end(ProjParser.Body_endContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ProjParser#segvar}.
 	 * @param ctx the parse tree
@@ -91,6 +103,12 @@ public interface ProjVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBody_program(ProjParser.Body_programContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ProjParser#assignment}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignment(ProjParser.AssignmentContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ProjParser#def_cond}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -114,6 +132,12 @@ public interface ProjVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitDef_while(ProjParser.Def_whileContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ProjParser#increment_decrement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncrement_decrement(ProjParser.Increment_decrementContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ProjParser#def_w}.
 	 * @param ctx the parse tree

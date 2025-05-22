@@ -1,11 +1,17 @@
 grammar Proj;
 
 @header{
-      package com.compi
+    package com.compi.Gramatica_ANLTR4;
 }
 
-prog: 'Program' segvar segfunct 'BEGIN' body_program 'END' EOF;
+// Main program structure
+prog: 'Program' header segvar segfunct 'BEGIN' body_program body_end 'END' EOF;
 
+header: 'NAME' ID ';';
+
+body_end: 'FINITO' ';';
+
+// Variable section
 segvar: 'VARIABLE' ':' (defvar (';' defvar)* ';')?;
 
 defvar: 'int' ID '=' Digitos 
@@ -13,18 +19,18 @@ defvar: 'int' ID '=' Digitos
       | 'string' ID '=' Cadena 
       | 'bool' ID '=' ('true'|'false')
       ;
-      
-segfunct: 'FUNCTION' ':' (deffunct)? ;
 
-deffunct: 'function' ID '(' ID ')' '{' bodyfunct '}' deffunct?;
+// Function section
+segfunct: 'FUNCTION' ':' (deffunct)*;
 
-bodyfunct: defarith ';' 'RETURN' ID ';' ;
+deffunct: 'function' ID '(' ID ')' '{' bodyfunct '}';
 
-//Aritmetica
-defarith: bodysegE ;
+bodyfunct: (defarith ';')* 'RETURN' ID ';';
 
-bodysegE: bodysegT bodysegE2 ;
+// Arithmetic expressions
+defarith: bodysegE;
 
+bodysegE: bodysegT bodysegE2;
 
 bodysegE2: ('+' bodysegT bodysegE2
           | '-' bodysegT bodysegE2
@@ -32,7 +38,6 @@ bodysegE2: ('+' bodysegT bodysegE2
           ;
 
 bodysegT: itemarith bodysegT2;
-
 
 bodysegT2: ('*' itemarith bodysegT2
           | '/' itemarith bodysegT2
@@ -43,45 +48,49 @@ itemarith: ID
          | Digitos
          | '(' bodysegE ')'
          ;
-		 
-body_program: (def_cond 
-		      | def_while 
-			  | def_w 
-			  | call_funct)* 
-			  ;
 
-//Seccion IF
-def_cond: 'cond' 'if' '(' def_exp  ')' '{' def_w   '}' else_cond? ;
+// Main program body
+body_program: (def_cond 
+              | def_while 
+              | def_w 
+              | call_funct
+              | assignment)*;
+
+// Assignment statement
+assignment: ID '=' (bodysegE | Cadena | 'true' | 'false') ';';
+
+// Conditional section
+def_cond: 'cond' 'if' '(' def_exp ')' '{' def_w '}' else_cond?;
 
 def_exp: ID COMP Digitos
-	   | ID EQUAL Digitos
-	   | ID EQUAL ('true'|'false')
-	   ;	
+       | ID EQUAL Digitos
+       | ID EQUAL ('true'|'false')
+       ;
 
-else_cond: 'else' '{' def_w   '}'  ; 	
+else_cond: 'else' '{' def_w '}';
 
+// While loop section - FIXED to properly capture increment/decrement
+def_while: 'loop' 'while' '(' def_exp ')' '{' (def_w)* increment_decrement '}';
 
+increment_decrement: ID ('+' | '-') ';';
 
-//Seccion While
-def_while: 'loop' 'while' '(' ID COMP Digitos ')' '{' def_w (ID '+' | ID '-') ';' '}';
+// Write/Read section
+def_w: 'output' 'write' '(' (Cadena | ID) ')' ';'
+     | 'input' ID '=' 'read' '(' ')' ';'
+     ;
 
+// Function call
+call_funct: ID '=' ID '(' ID ')' ';';
 
-//Seccion Write/Read
-def_w: 'output' 'write' '(' (Cadena|ID) ')' ';'
-	  | 'input' ID '=' 'read' '(' ')' ';'
-	  ;  
-
-//Seccion CallFunction
-
-call_funct: ID '=' ID '(' ID ')' ';' ;
-		 
-
-
-// Tokens léxicos	
+// Lexical tokens
 ID: [a-zA-Z][a-zA-Z0-9]*;
 Digitos: [0-9]+;
 Cadena: '"' ( '\\"' | ~["\r\n] )* '"';
 NEWLINE: [\r\n]+ -> skip;
 BLANKSPACE: [ \t]+ -> skip;
-COMP:('>'|'<'| '>=' |'<=');
-EQUAL: ('=='|'!=');
+COMP: ('>' | '<' | '>=' | '<=');
+EQUAL: ('==' | '!=');
+
+// Comments (optional)
+COMMENT: '//' ~[\r\n]* -> skip;
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;

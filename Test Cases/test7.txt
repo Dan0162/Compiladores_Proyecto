@@ -1,5 +1,8 @@
 Program
 
+NAME test7;
+
+
 VARIABLE:
 
 int result = 0;
@@ -25,5 +28,6 @@ loop while( result > 18)
 
 }
 
+FINITO;
 
 END

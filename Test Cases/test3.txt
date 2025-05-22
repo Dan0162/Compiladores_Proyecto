@@ -1,5 +1,8 @@
 Program
 
+NAME test3;
+
+
 VARIABLE:
 
 int lenum = 0;
@@ -17,5 +20,7 @@ cond if (lenum > 33){
 else{
    output write("Es menor a 33");
 }
+
+FINITO;
 
 END
