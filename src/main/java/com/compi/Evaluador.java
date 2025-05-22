@@ -1,6 +1,7 @@
 package com.compi;
 
 import com.compi.Gramatica_ANLTR4.ProjBaseVisitor;
+import com.compi.Gramatica_ANLTR4.ProjParser;
 import com.compi.Gramatica_ANLTR4.ProjParser.*;
 
 public class Evaluador extends ProjBaseVisitor<String> {
@@ -74,45 +75,43 @@ public class Evaluador extends ProjBaseVisitor<String> {
     @Override
     public String visitDeffunct(DeffunctContext ctx) {
         System.out.println("Visit: Deffunct");
-        if (ctx.ID().size() >= 2) {
-            String functionName = ctx.ID(0).getText();
-            String paramName = ctx.ID(1).getText();
-            
-            exportProg += indent() + "public static int " + functionName + "(" + "int " + paramName + ") {\n";
-            indentLevel++;
-            visit(ctx.bodyfunct());
-            indentLevel--;
-            exportProg += indent() + "}\n\n";
-            
-            if (ctx.deffunct() != null) {
-                visit(ctx.deffunct());
-            }
-        }
+        
+        String functionName = ctx.ID(0).getText();
+        String paramName = ctx.ID(1).getText();
+        
+        exportProg += indent() + "public static int " + functionName + "(" + "int " + paramName + ") {\n";
+        indentLevel++;
+        visit(ctx.bodyfunct());
+        indentLevel--;
+        exportProg += indent() + "}\n\n";
+        
         return null;
     }
 
-    @Override
-    public String visitBodyfunct(BodyfunctContext ctx) {
-        System.out.println("Visit: Bodyfunct");
+@Override
+public String visitBodyfunct(BodyfunctContext ctx) {
+    System.out.println("Visit: Bodyfunct");
+    
+    for (DefarithContext defarithCtx : ctx.defarith()) {
+        StringBuilder expressionBuilder = new StringBuilder();
+        processDefarith(defarithCtx, expressionBuilder);
         
-        if (ctx.defarith() != null) {
-            StringBuilder expressionBuilder = new StringBuilder();
-            processDefarith(ctx.defarith(), expressionBuilder);
-            
-            if (!expressionBuilder.toString().isEmpty()) {
-                if (ctx.defarith().bodysegE() != null) {
-                    String paramName = ctx.ID().getText();
-                    exportProg += indent() + paramName + " = " + expressionBuilder.toString() + ";\n";
-                }
+        if (!expressionBuilder.toString().isEmpty()) {
+
+            DeffunctContext parentCtx = (DeffunctContext) ctx.getParent();
+            if (parentCtx != null && parentCtx.ID().size() >= 2) {
+                String paramName = parentCtx.ID(1).getText();
+                exportProg += indent() + paramName + " = " + expressionBuilder.toString() + ";\n";
             }
         }
-        
-        if (ctx.ID() != null) {
-            exportProg += indent() + "return " + ctx.ID().getText() + ";\n";
-        }
-        
-        return null;
     }
+    
+    if (ctx.ID() != null) {
+        exportProg += indent() + "return " + ctx.ID().getText() + ";\n";
+    }
+    
+    return null;
+}
     
     private void processDefarith(DefarithContext ctx, StringBuilder builder) {
         if (ctx.bodysegE() != null) {
@@ -244,7 +243,7 @@ public class Evaluador extends ProjBaseVisitor<String> {
     private String convertEqualOperator(String op) {
         if ("==".equals(op)) return "==";
         if ("!=".equals(op)) return "!=";
-        return op; 
+        return op;
     }
 
     @Override
@@ -262,32 +261,45 @@ public class Evaluador extends ProjBaseVisitor<String> {
         return null;
     }
 
-    @Override
-    public String visitDef_while(Def_whileContext ctx) {
-        System.out.println("Visit: Def_while");
-        
-        String id = ctx.ID(0).getText();
-        String comp = ctx.COMP().getText();
-        String value = ctx.Digitos().getText();
-        
-        exportProg += indent() + "while (" + id + " " + comp + " " + value + ") {\n";
-        
-        indentLevel++;
-        visit(ctx.def_w());
-        
-        String updateId = ctx.ID(1).getText();
-        String op = ctx.getChild(8).getText();
-        if ("+".equals(op)) {
-            exportProg += indent() + updateId + "++;\n";
-        } else if ("-".equals(op)) {
-            exportProg += indent() + updateId + "--;\n";
-        }
-        
-        indentLevel--;
-        exportProg += indent() + "}\n";
-        
-        return null;
+@Override
+public String visitDef_while(Def_whileContext ctx) {
+    System.out.println("Visit: Def_while");
+    
+    exportProg += indent() + "while (";
+    visit(ctx.def_exp());
+    exportProg += ") {\n";
+    
+    indentLevel++;
+    
+    for (Def_wContext wCtx : ctx.def_w()) {
+        visit(wCtx);
     }
+    
+    if (ctx.increment_decrement() != null) {
+        visit(ctx.increment_decrement());
+    }
+    
+    indentLevel--;
+    exportProg += indent() + "}\n";
+    
+    return null;
+}
+
+@Override
+public String visitIncrement_decrement(Increment_decrementContext ctx) {
+    System.out.println("Visit: Increment_decrement");
+    
+    String varName = ctx.ID().getText();
+    String operator = ctx.getChild(1).getText();
+    
+    if (operator.equals("+")) {
+        exportProg += indent() + varName + "++;\n";
+    } else if (operator.equals("-")) {
+        exportProg += indent() + varName + "--;\n";
+    }
+    
+    return null;
+}
 
     @Override
     public String visitDef_w(Def_wContext ctx) {
@@ -300,7 +312,7 @@ public class Evaluador extends ProjBaseVisitor<String> {
             } else if (ctx.ID() != null) {
                 content = ctx.ID().getText();
             } else {
-                content = "\"\""; 
+                content = "\"\"";
             }
             exportProg += indent() + "System.out.println(" + content + ");\n";
         } else if (ctx.getText().contains("input")) {
@@ -319,9 +331,7 @@ public class Evaluador extends ProjBaseVisitor<String> {
         return null;
     }
     
-
     private String determineVariableType(String varName) {
-        // Check for types in the generated code
         if (exportProg.contains("int " + varName + " =")) {
             return "int";
         } else if (exportProg.contains("float " + varName + " =")) {
@@ -332,11 +342,9 @@ public class Evaluador extends ProjBaseVisitor<String> {
             return "boolean";
         }
         
-        // Default to int if type can't be determined
         return "int";
     }
     
-
     private String getScannerMethodForType(String type) {
         switch (type) {
             case "int":
@@ -348,7 +356,7 @@ public class Evaluador extends ProjBaseVisitor<String> {
             case "boolean":
                 return "nextBoolean()";
             default:
-                return "nextInt()"; 
+                return "nextInt()";
         }
     }
 
@@ -374,7 +382,7 @@ public class Evaluador extends ProjBaseVisitor<String> {
         indentLevel--;
         exportProg += indent() + "}\n";
         
-       exportProg += "}\n";
+        exportProg += "}\n";
         
         return null;
     }
