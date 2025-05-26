@@ -1,0 +1,37 @@
+Program
+
+NAME LastTest2;
+
+VARIABLE:
+
+int lenum = 0;
+int result = 0;
+ 
+FUNCTION:
+
+function Menosuno (residuo)
+{
+   residuo - 1;
+   RETURN residuo;
+
+}
+
+BEGIN
+
+input lenum = read();
+
+result = Menosuno(lenum);
+
+output write (result);
+
+cond if (lenum > 20){
+
+   output write("Es mayor a 20");
+}
+else{
+   output write("Es menor o igual a 20");
+}
+
+FINITO;
+
+END

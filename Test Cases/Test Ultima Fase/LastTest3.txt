@@ -1,0 +1,37 @@
+Program
+
+NAME LastTest3;
+
+
+VARIABLE:
+
+int result = 0;
+int numm = 37;
+string init = "Ingrese su nombre";
+string nombre = "";
+
+FUNCTION:
+
+function Rotacion (num1){
+	(num1 + 3) / 2;
+	RETURN num1;
+}
+
+BEGIN
+
+output write (init);
+input nombre = read();
+output write ("Hola");
+output write (nombre);
+result = Rotacion (numm);
+
+loop while( result > 18)
+{
+	output write ("Es legal");
+	result-;
+
+}
+
+FINITO;
+
+END

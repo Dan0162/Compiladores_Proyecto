@@ -1,0 +1,27 @@
+Program
+
+NAME LastTest4;
+
+
+VARIABLE:
+
+int result = 0;
+int numm = 33;
+string test = "JG diff";
+
+FUNCTION:
+
+function fOO (num1){
+        num1 + 2;
+        RETURN num1;
+}
+
+BEGIN
+
+result = foo(numm);
+
+output write(result);
+
+FINITO;
+
+END
