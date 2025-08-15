@@ -1,7 +1,6 @@
 package com.compi;
 
 import com.compi.Gramatica_ANLTR4.ProjBaseVisitor;
-import com.compi.Gramatica_ANLTR4.ProjParser;
 import com.compi.Gramatica_ANLTR4.ProjParser.*;
 
 public class Evaluador extends ProjBaseVisitor<String> {

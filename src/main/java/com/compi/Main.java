@@ -22,107 +22,194 @@ import org.antlr.v4.runtime.CharStreams;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-        System.out.println(
-                "Por favor ingresar la ruta del archivo .txt que contiene su lenguaje. Solamente se aceptan archivos .txt\n");
-
+        // Flujo principal: acepta argumento CLI (ruta) o pide por consola. Incluye manejo de errores para
+        // fallos de lectura, parseo o evaluación y mensajes claros al usuario.
         String path = null;
         try {
-            path = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (!path.endsWith(".txt")) {
-            throw new Exception("El archivo ingresado no es un archivo .txt");
-        }
-
-        String file = getFile(path);
-
-        if (file != null) {
-            Lexer lexer = new Lexer(file);
-            lexer.tokenize();
-            for (TOKEN token : lexer.getTokens()) {
-                System.out.println("Token: " + token.type + " -> " + token.value);
+            // Si se pasa un argumento, lo usamos como ruta (útil para scripts y tests automatizados)
+            if (args != null && args.length > 0 && args[0] != null && !args[0].isEmpty()) {
+                path = args[0];
+            } else {
+                path = promptForPath();
             }
 
-            System.out.println("--------------------------------------------------");
+            validateTxtExtension(path);
 
-            ProjLexer lexer2 = new ProjLexer(CharStreams.fromString(file));
-            CommonTokenStream tokens = new CommonTokenStream(lexer2);
-            ProjParser parser = new ProjParser(tokens);
+            String source = readFileContent(path);
+            if (source == null) {
+                System.err.println("No se pudo leer el archivo de entrada. Compruebe la ruta y permisos.");
+                return;
+            }
 
-            ParseTree tree = parser.prog();
+            // Mostrar tokens (si falla, continuamos mostrando un mensaje amigable)
+            try {
+                printTokens(source);
+            } catch (Exception e) {
+                System.err.println("Advertencia: fallo al tokenizar/mostrar tokens: " + e.getMessage());
+            }
 
-            // Usar el visitor
+            // Parsear y evaluar con protección frente a excepciones en ANTLR o en el visitor
+            ParseTree tree = null;
+            try {
+                tree = parseSource(source);
+            } catch (RuntimeException re) {
+                System.err.println("Error durante el parseo: " + re.getMessage());
+                return;
+            }
+
             Evaluador visitor = new Evaluador();
-            String resultado = visitor.visit(tree);
+            String resultado = null;
+            try {
+                resultado = visitor.visit(tree); // puede devolver null si no hay resultado imprimible
+            } catch (Exception e) {
+                System.err.println("Error durante la evaluación del programa: " + e.getMessage());
+            }
 
-            createFile(visitor.getExportName() + ".java", visitor.getExportProg());
+            if (resultado != null) {
+                System.out.println("Resultado de la evaluación: " + resultado);
+            } else {
+                System.out.println("Evaluación completada (sin resultado retornado explícito). Vea salida previa para mensajes.");
+            }
 
+            // Intentar exportar el programa generado por el visitor (si existe)
+            try {
+                String exportName = visitor.getExportName();
+                String exportProg = visitor.getExportProg();
+                if (exportName != null && exportProg != null && !exportName.trim().isEmpty() && !exportProg.trim().isEmpty()) {
+                    boolean ok = createFile(exportName + ".java", exportProg);
+                    if (!ok) {
+                        System.err.println("No se pudo crear el archivo exportado.");
+                    }
+                } else {
+                    System.out.println("No hay archivo para exportar.");
+                }
+            } catch (Exception e) {
+                System.err.println("Error al intentar exportar el programa: " + e.getMessage());
+            }
+
+        } catch (IllegalArgumentException iae) {
+            System.err.println("Argumento inválido: " + iae.getMessage());
+        } catch (Exception e) {
+            // Capturamos excepciones inesperadas para no mostrar stack traces crudos al usuario final
+            System.err.println("Se produjo un error inesperado: " + e.getMessage());
+            // Opcional: para debugging, puede descomentar la siguiente línea
+            // e.printStackTrace();
         }
-
     }
 
     public static String getFile(String path) {
-        try {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8));
-            StringBuilder stringBuilder = new StringBuilder();
+        // Mantener compatibilidad con código previo; delega en readFileContent
+        return readFileContent(path);
+    }
+
+    /**
+     * Lee el contenido del archivo indicado con codificación UTF-8.
+     * Devuelve null en caso de error.
+     */
+    public static String readFileContent(String path) {
+        Path p = Paths.get(path);
+        if (!Files.exists(p)) {
+            System.err.println("El archivo no existe: " + path);
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
+                sb.append(line).append('\n');
             }
-            reader.close();
-            return stringBuilder.toString();
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            return sb.toString();
+        } catch (IOException e) {
+            System.err.println("Error leyendo el archivo: " + e.getMessage());
             return null;
         }
     }
 
+    /**
+     * Pide al usuario la ruta del archivo de entrada por consola.
+     */
+    public static String promptForPath() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+        System.out.println(
+                "Por favor ingresar la ruta del archivo .txt que contiene su lenguaje. Solamente se aceptan archivos .txt\n");
+        return reader.readLine();
+    }
+
+    /**
+     * Verifica que la ruta termine en .txt y lanza excepción si no.
+     */
+    public static void validateTxtExtension(String path) throws Exception {
+        if (path == null || !path.toLowerCase().endsWith(".txt")) {
+            throw new Exception("El archivo ingresado no es un archivo .txt");
+        }
+    }
+
+    /**
+     * Utiliza el lexer local para tokenizar e imprimir tokens al usuario.
+     */
+    public static void printTokens(String source) {
+        Lexer lexer = new Lexer(source);
+        lexer.tokenize();
+        for (TOKEN token : lexer.getTokens()) {
+            System.out.println("Token: " + token.type + " -> " + token.value);
+        }
+        System.out.println("--------------------------------------------------");
+    }
+
+    /**
+     * Crea el árbol de análisis (ParseTree) usando ANTLR y devuelve la raíz.
+     */
+    public static ParseTree parseSource(String source) {
+        ProjLexer lexer = new ProjLexer(CharStreams.fromString(source));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        ProjParser parser = new ProjParser(tokens);
+        return parser.prog();
+    }
+
     public static boolean createFile(String export_name, String export_prog) {
-    Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+
+            // Pedir directorio de salida al usuario
+            System.out.print("Ingrese el directorio para guardar su archivo: ");
+            String directoryPath = scanner.nextLine();
+            // Crear el directorio si no existe
+            Path directory = Paths.get(directoryPath);
+            if (!Files.exists(directory)) {
+                try {
+                    Files.createDirectories(directory);
+                    System.out.println("Directorio creado: " + directoryPath);
+                } catch (IOException e) {
+                    System.err.println("Error al crear el directorio: " + e.getMessage());
+                    return false;
+                }
+            }
+
+            // Construir la ruta completa del archivo de salida
+            String filePath = directoryPath + File.separator + export_name;
+            File file = new File(filePath);
+
+            // Comprobar si el archivo ya existe y preguntar para sobrescribir
+            if (file.exists()) {
+                System.out.print("El archivo ya existe. ¿Desea sobrescribirlo? (y/n): ");
+                String response = scanner.nextLine().trim().toLowerCase();
+                if (!response.equals("y")) {
+                    System.out.println("Creación de archivo cancelada.");
+                    return false;
+                }
+            }
     
-    // Ask for directory
-    System.out.print("Ingrese el directorio para guardar su archivo: ");
-    String directoryPath = scanner.nextLine();
-    
-    // Create directory if it doesn't exist
-    Path directory = Paths.get(directoryPath);
-    if (!Files.exists(directory)) {
-        try {
-            Files.createDirectories(directory);
-            System.out.println("Directorio creado: " + directoryPath);
-        } catch (IOException e) {
-            System.err.println("Error al crear el directorio: " + e.getMessage());
-            return false;
+            // Escribir contenido en el archivo
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(export_prog);
+                System.out.println("Archivo creado exitosamente en: " + filePath);
+                return true;
+            } catch (IOException e) {
+                System.err.println("Error al escribir en el archivo: " + e.getMessage());
+                return false;
+            }
         }
-    }
-    
-    // Create full path for the file
-    String filePath = directoryPath + File.separator + export_name;
-    File file = new File(filePath);
-    
-    // Check if file already exists
-    if (file.exists()) {
-        System.out.print("El archivo ya existe. ¿Desea sobrescribirlo? (y/n): ");
-        String response = scanner.nextLine().trim().toLowerCase();
-        if (!response.equals("y")) {
-            System.out.println("Creación de archivo cancelada.");
-            return false;
-        }
-    }
-    
-    // Write content to file
-    try (FileWriter writer = new FileWriter(file)) {
-        writer.write(export_prog);
-        System.out.println("Archivo creado exitosamente en: " + filePath);
-        return true;
-    } catch (IOException e) {
-        System.err.println("Error al escribir en el archivo: " + e.getMessage());
-        return false;
-    }
 }
 
 }
