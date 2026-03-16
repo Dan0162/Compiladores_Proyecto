@@ -11,6 +11,7 @@
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
         <maven.compiler.target>24</maven.compiler.target>
+        <sonar.organization>dan0162</sonar.organization>
     </properties>
 
     <build>
